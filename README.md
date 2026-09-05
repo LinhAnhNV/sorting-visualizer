@@ -12,8 +12,8 @@
 | Tên | Vai trò |
 |---|---|
 | Nguyễn Văn Linh Anh (A) | Core thuật toán + Trực quan hóa (Canvas) |
-| [Tên B] | Quản lý phiên mô phỏng + Thống kê |
-| [Tên C] | Tài khoản + Regex + Crawl/API |
+| Nguyễn Trần Anh Khoa (B) | Quản lý phiên mô phỏng + Thống kê |
+| Trương Phạm Gia Nghi (C) | Tài khoản + Regex + Crawl/API |
 
 ## Cấu trúc thư mục
 
