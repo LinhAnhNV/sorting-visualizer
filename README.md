@@ -17,6 +17,7 @@
 
 ## Cấu trúc thư mục
 
+```
 sorting-visualizer/
 ├── main.py # Điểm khởi động, ráp 3 module vào main window
 ├── config.py # Hằng số dùng chung (đường dẫn, màu sắc, font)
@@ -26,6 +27,7 @@ sorting-visualizer/
 ├── data/ # File dữ liệu JSON (không commit dữ liệu thật)
 ├── utils/ # Tiện ích dùng chung (sys module...)
 └── tests/ # Test case từng module
+```
 
 ## Yêu cầu môi trường
 
