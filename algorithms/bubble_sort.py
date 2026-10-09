@@ -11,21 +11,23 @@ class BubbleSort(SortingAlgorithm):
     def step(self):
         if self.is_done():
             return None
-        n = len(self.values)
 
-        # 1 buoc = 1 lan so sanh (+ hoan doi neu can)
-        self.so_sanh += 1
+        # 1 bước = đúng 1 lần so sánh 2 phần tử kề nhau (+ đổi chỗ nếu cần)
         a, b = self.j, self.j + 1
+        self.so_sanh += 1
 
         if self.values[a] > self.values[b]:
             self._swap(a, b)
 
         self.j += 1
-        if self.j >= n - 1 - self.i:
-            self.j = 0
-            self.i += 1
+        if self.j >= len(self.values) - 1 - self.i:  # hết lượt: sang lượt mới
+            self._next_pass()
 
         return (a, b)
+
+    def _next_pass(self):
+        self.j = 0
+        self.i += 1
 
     def is_done(self):
         return self.i >= len(self.values) - 1
