@@ -5,7 +5,7 @@ class SelectionSort(SortingAlgorithm):
     rồi đổi chỗ nó về đầu phần đó."""
     def __init__(self, values):
         super().__init__(values)
-        self.ten = "Selection Sort"
+        self.name = "Selection Sort"
         self.i = 0          # vị trí đang chờ phần tử nhỏ nhất; bên trái i đã xong
         self.j = 1          # vị trí đang xét trong lượt hiện tại
         self.min_idx = 0    # vị trí phần tử nhỏ nhất tìm được tới lúc này
