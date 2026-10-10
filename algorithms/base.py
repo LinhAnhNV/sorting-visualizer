@@ -1,4 +1,4 @@
-# Lớp cơ sở cho các thuật toán sắp xếp chạy từng bước (module A).
+# Lớp cơ sở cho các thuật toán sắp xếp chạy từng bước (module A)
 from abc import ABC, abstractmethod
 
 class SortingAlgorithm(ABC):
@@ -8,7 +8,7 @@ class SortingAlgorithm(ABC):
         self.values = list(values)     # bản đang được sắp xếp dần
         self.so_sanh = 0               # số lần so sánh
         self.so_hoan_doi = 0           # số lần hoán đổi
-        self.ten = "Chua dat ten"      # lớp con gán lại tên thật
+        self.name = "Chua dat ten"      # lớp con gán lại tên thật
 
     @abstractmethod
     def step(self):
@@ -30,9 +30,9 @@ class SortingAlgorithm(ABC):
         """Trả về (số lần so sánh, số lần hoán đổi)."""
         return self.so_sanh, self.so_hoan_doi
 
-    def get_ten(self):
+    def get_name(self):
         """Trả về tên thuật toán để hiển thị."""
-        return self.ten
+        return self.name
 
     def reset(self):
         """Đưa dãy về ban đầu và xóa bộ đếm.
@@ -46,7 +46,7 @@ class SortingAlgorithm(ABC):
         """Chạy liên tục tới khi xong, trả về (so_sanh, so_hoan_doi)."""
         while not self.is_done():
             self.step()
-        return self.get_counts
+        return self.get_counts()
 
     def _swap(self, i, j):
         """Hoán đổi hai phần tử và tự cộng vào bộ đếm hoán đổi."""
