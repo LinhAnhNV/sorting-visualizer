@@ -41,5 +41,5 @@ class SelectionSort(SortingAlgorithm):
     def reset(self):
         super().reset()
         self.i = 0
-        self.j = 0
+        self.j = 1
         self.min_idx = 0

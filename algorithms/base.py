@@ -1,4 +1,4 @@
-# Lớp cơ sở cho các thuật toán sắp xếp chạy từng bước (module A)
+# Lớp cơ sở cho các thuật toán sắp xếp chạy từng bước
 from abc import ABC, abstractmethod
 
 class SortingAlgorithm(ABC):

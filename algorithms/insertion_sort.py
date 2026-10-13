@@ -38,4 +38,4 @@ class InsertionSort(SortingAlgorithm):
     def reset(self):
         super().reset()
         self.i = 1
-        self.j = 0
+        self.j = 1
