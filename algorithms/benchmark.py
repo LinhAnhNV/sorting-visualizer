@@ -1,6 +1,7 @@
-# So sánh hiệu năng các thuật toán sắp xếp trên nhiều kích thước dãy (module A)
+# So sánh hiệu năng các thuật toán sắp xếp trên nhiều kích thước dãy
 import random
 import time
+
 from algorithms.bubble_sort import BubbleSort
 from algorithms.insertion_sort import InsertionSort
 from algorithms.selection_sort import SelectionSort
