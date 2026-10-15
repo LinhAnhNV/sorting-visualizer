@@ -17,6 +17,9 @@ _EMAIL_RE = re.compile(
     r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}"
 )
 _PHONE_VN_RE = re.compile(r"0[0-9]{9}")
+# chỉ nhận chữ số 0-9 (không nhận dấu +/-, dấu gạch dưới "_" hay chữ số toàn góc)
+_INT_RE = re.compile(r"[0-9]+")
+
 
 def username_errors(username):
     if not isinstance(username, str):
@@ -77,8 +80,10 @@ def is_valid_phone(phone):
 def parse_number_list(text):
     """Chuyển "5, 3, 8, 1" -> [5, 3, 8, 1] (A và B dùng để nhập dãy số).
 
+    Chỉ nhận số nguyên dương: số âm và số 0 bị từ chối vì dãy này dùng để vẽ cột.
     Raise TypeError nếu text không phải chuỗi.
-    Raise ValueError (kèm thông báo rõ ràng) nếu rỗng, có phần tử rỗng hoặc không phải số nguyên.
+Raise ValueError (kèm thông báo rõ ràng) nếu rỗng, có phần tử trống hoặc không phải
+    số nguyên dương.
     """
     if not isinstance(text, str):
         raise TypeError("Dữ liệu phải là chuỗi")
@@ -90,8 +95,10 @@ def parse_number_list(text):
         part = part.strip()
         if not part:
             raise ValueError("Có phần tử trống (thừa dấu ','). Ví dụ đúng: 5, 3, 8, 1")
-        try:
-            result.append(int(part))
-        except ValueError:
-            raise ValueError(f"'{part}' không phải số nguyên") from None
+        if not _INT_RE.fullmatch(part):
+            raise ValueError(f"'{part}' không phải số nguyên dương")
+        number = int(part)
+        if number == 0:
+            raise ValueError("Mỗi số phải lớn hơn 0")
+        result.append(number)
     return result
