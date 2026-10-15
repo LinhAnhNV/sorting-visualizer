@@ -18,7 +18,6 @@ _EMAIL_RE = re.compile(
 )
 _PHONE_VN_RE = re.compile(r"0[0-9]{9}")
 
-
 def username_errors(username):
     if not isinstance(username, str):
         return ["Username phải là chuỗi ký tự"]
