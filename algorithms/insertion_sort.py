@@ -4,7 +4,7 @@ class InsertionSort(SortingAlgorithm):
     """Lấy từng phần tử, lùi dần sang trái cho tới đúng chỗ."""
     def __init__(self, values):
         super().__init__(values)
-        self.ten = "Insertion sort"
+        self.name = "Insertion sort"
         self.i = 1  # phần tử đang được chèn; bên trái i là phần đã sắp xếp
         self.j = 1  # vị trí hiện tại của phần tử đó khi đang lùi sang trái
 
@@ -38,4 +38,4 @@ class InsertionSort(SortingAlgorithm):
     def reset(self):
         super().reset()
         self.i = 1
-        self.j = 0
+        self.j = 1

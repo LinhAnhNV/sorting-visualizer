@@ -4,7 +4,7 @@ class BubbleSort(SortingAlgorithm):
     """Mỗi bước so sánh một cặp liền kề, sai thứ tự thì đổi chỗ."""
     def __init__(self, values):
         super().__init__(values)
-        self.ten = "Bubble Sort"
+        self.name = "Bubble Sort"
         self.i = 0  # số lượt đã chạy xong; cuối dãy có i phần tử đã về đúng chỗ
         self.j = 0  # vị trí cặp đang so sánh trong lượt hiện tại
 
