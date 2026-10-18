@@ -8,6 +8,9 @@ Chạy thử riêng (từ thư mục gốc dự án):  python -m algorithms.ui_s
 import random
 import time
 
+import config
+from accounts.validators import parse_number_list
+
 import tkinter as tk
 from tkinter import messagebox ,ttk
 import config
@@ -107,25 +110,10 @@ class SortPanel(tk.Frame):
 
     # ---------- nhập dãy số ----------
     def parse_values(self, text):
-        """Đổi chuỗi "5, 3, 8" thành list số nguyên dương. Sai thì báo ValueError.
- 
-        Tạm thời kiểm tra ở đây; sau này có thể thay bằng parse_number_list
-        của Nghi trong accounts/validators.py."""
-        if text.strip() == "":
-            raise ValueError("Lỗi: Chưa nhập dãy số.")
-        values = []
-        for part in text.split(","):
-            part = part.strip()
-            if part == "":
-                raise ValueError("Lỗi: Có ô trống giữa hai dấu phẩy. Ví dụ đúng: 5, 3, 8, 1")
-            if not (part.isascii() and part.isdigit()):
-                raise ValueError(f"Lỗi: '{part}' Không phải số nguyên dương.")
-            number = int(part)
-            if number <= 0:
-                raise ValueError("Lỗi: Mỗi số phải lớn hơn 0.")
-            values.append(number)
+        """Đổi chuỗi "5, 3, 8" thành list số nguyên dương. Sai thì báo ValueError."""
+        values = parse_number_list(text)
         if len(values) > config.MAX_ELEMENTS:
-            raise ValueError(f"Lỗi: Tối đa {config.MAX_ELEMENTS} phần tử, bạn nhập {len(values)}.")
+            raise ValueError(f"Tối đa {config.MAX_ELEMENTS} phần tử, bạn nhập {len(values)}.")
         return values
 
     def apply_input(self):
