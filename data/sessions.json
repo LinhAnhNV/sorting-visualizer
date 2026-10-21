@@ -2,9 +2,10 @@
     "users": [
         {
             "username": "khoa",
+            "role": "user",
             "sessions": [
                 {
-                    "session_id": "SES001",
+                    "session_id": "SE0001",
                     "algorithm": "Bubble Sort",
                     "values": [
                         5,
@@ -27,7 +28,7 @@
                     "username": "khoa"
                 },
                 {
-                    "session_id": "SES002",
+                    "session_id": "SE0002",
                     "username": "khoa",
                     "algorithm": "Selection Sort",
                     "values": [
@@ -52,7 +53,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES003",
+                    "session_id": "SE0003",
                     "username": "khoa",
                     "algorithm": "Insertion Sort",
                     "values": [
@@ -75,7 +76,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES004",
+                    "session_id": "SE0004",
                     "username": "khoa",
                     "algorithm": "Quick Sort",
                     "values": [
@@ -105,9 +106,10 @@
         },
         {
             "username": "minh",
+            "role": "user",
             "sessions": [
                 {
-                    "session_id": "SES005",
+                    "session_id": "SE0005",
                     "username": "minh",
                     "algorithm": "Bubble Sort",
                     "values": [
@@ -130,7 +132,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES006",
+                    "session_id": "SE0006",
                     "username": "minh",
                     "algorithm": "Merge Sort",
                     "values": [
@@ -159,7 +161,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES007",
+                    "session_id": "SE0007",
                     "username": "minh",
                     "algorithm": "Insertion Sort",
                     "values": [
@@ -185,9 +187,10 @@
         },
         {
             "username": "an",
+            "role": "user",
             "sessions": [
                 {
-                    "session_id": "SES008",
+                    "session_id": "SE0008",
                     "username": "an",
                     "algorithm": "Selection Sort",
                     "values": [
@@ -210,7 +213,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES009",
+                    "session_id": "SE0009",
                     "username": "an",
                     "algorithm": "Quick Sort",
                     "values": [
@@ -235,7 +238,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES010",
+                    "session_id": "SE0010",
                     "username": "an",
                     "algorithm": "Bubble Sort",
                     "values": [
@@ -258,7 +261,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES011",
+                    "session_id": "SE0011",
                     "username": "an",
                     "algorithm": "Merge Sort",
                     "values": [
@@ -285,7 +288,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES012",
+                    "session_id": "SE0012",
                     "username": "an",
                     "algorithm": "Insertion Sort",
                     "values": [
@@ -307,9 +310,10 @@
         },
         {
             "username": "linh",
+            "role": "user",
             "sessions": [
                 {
-                    "session_id": "SES013",
+                    "session_id": "SE0013",
                     "username": "linh",
                     "algorithm": "Bubble Sort",
                     "values": [],
@@ -320,7 +324,7 @@
                     "sorted_values": []
                 },
                 {
-                    "session_id": "SES014",
+                    "session_id": "SE0014",
                     "username": "linh",
                     "algorithm": "Selection Sort",
                     "values": [
@@ -335,7 +339,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES015",
+                    "session_id": "SE0015",
                     "username": "linh",
                     "algorithm": "Quick Sort",
                     "values": [
@@ -361,9 +365,10 @@
         },
         {
             "username": "nam",
+            "role": "user",
             "sessions": [
                 {
-                    "session_id": "SES016",
+                    "session_id": "SE0016",
                     "username": "nam",
                     "algorithm": "Merge Sort",
                     "values": [
@@ -386,7 +391,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES017",
+                    "session_id": "SE0017",
                     "username": "nam",
                     "algorithm": "Bubble Sort",
                     "values": [
@@ -411,7 +416,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES018",
+                    "session_id": "SE0018",
                     "username": "nam",
                     "algorithm": "Insertion Sort",
                     "values": [
@@ -434,7 +439,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES019",
+                    "session_id": "SE0019",
                     "username": "nam",
                     "algorithm": "Quick Sort",
                     "values": [
@@ -466,9 +471,35 @@
         },
         {
             "username": "Nhu",
+            "role": "admin",
             "sessions": [
                 {
-                    "session_id": "SES021",
+                    "session_id": "SE0020",
+                    "username": "Nhu",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        5,
+                        2,
+                        9,
+                        1,
+                        5,
+                        7
+                    ],
+                    "swaps": 10,
+                    "comparisons": 11,
+                    "create_at": "2026-10-19T21:16:13",
+                    "note": "This is not a test session.",
+                    "sorted_values": [
+                        1,
+                        2,
+                        5,
+                        5,
+                        7,
+                        9
+                    ]
+                },
+                {
+                    "session_id": "SE0021",
                     "username": "Nhu",
                     "algorithm": "Bubble Sort",
                     "values": [
@@ -497,7 +528,7 @@
                     ]
                 },
                 {
-                    "session_id": "SES022",
+                    "session_id": "SE0022",
                     "username": "Nhu",
                     "algorithm": "Bubble Sort",
                     "values": [
