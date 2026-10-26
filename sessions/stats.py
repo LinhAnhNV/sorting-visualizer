@@ -1,4 +1,7 @@
 # Thống kê trên danh sách Session (lấy từ SessionManager.sessions)
+import json
+import os
+from datetime import datetime
 
 
 def _avg(total, count):
@@ -68,3 +71,38 @@ def format_report(sessions):
             f"{st['avg_comparisons']} so sánh"
         )
     return "\n".join(lines)
+
+
+def build_report(sessions, username="", scope="", algorithm_filter=None):
+    """Gom kết quả thống kê thành một dict để xuất ra JSON:
+    thông tin về lần xuất, thống kê tổng quan (summary) và thống kê theo thuật toán (by_algorithm)."""
+    return {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "exported_by": username,
+        "scope": scope,
+        "algorithm_filter": algorithm_filter,
+        "summary": summarize(sessions),
+        "by_algorithm": dict(sorted(by_algorithm(sessions).items())),
+    }
+
+
+def export_json(sessions, path, username="", scope="", algorithm_filter=None):
+    """Ghi thống kê của `sessions` ra file JSON tại `path` và trả về dict đã ghi.
+    Ghi qua file tạm rồi thay thế để file đích không bị hỏng nửa chừng. Lỗi ghi file -> OSError."""
+    report = build_report(sessions, username, scope, algorithm_filter)
+
+    tmp_path = path + ".tmp"
+    try:
+        folder = os.path.dirname(path)
+        if folder:
+            os.makedirs(folder, exist_ok=True)
+        with open(tmp_path, "w", encoding="utf-8") as f:
+            json.dump(report, f, indent=4, ensure_ascii=False)
+        os.replace(tmp_path, path)
+    except OSError:
+        try:
+            os.remove(tmp_path)
+        except OSError:
+            pass
+        raise
+    return report

@@ -65,8 +65,7 @@ def _validate(algorithm, values, sorted_values, swaps, comparisons):
     if not _is_int_list(sorted_values):
         raise ValueError("sorted_values phải là list các số nguyên")
     if not _is_sorted_permutation(values, sorted_values):
-        raise ValueError("sorted_values phải là dãy values đã được sắp xếp "
-                         "(đủ các phần tử và có thứ tự)")
+        raise ValueError("sorted_values phải là dãy values đã được sắp xếp tăng hoặc giảm")
     if not _is_int(swaps) or swaps < 0:
         raise ValueError("swaps phải là số nguyên >= 0")
     if not _is_int(comparisons) or comparisons < 0:
@@ -169,7 +168,7 @@ class SessionManager:
         """Đọc toàn bộ file JSON.
         - File chưa có hoặc rỗng -> dữ liệu rỗng.
         - Không mở được -> SessionDataError.
-        - Sai JSON / sai cấu trúc -> CorruptDataError (không bao giờ âm thầm ghi đè)."""
+        - Sai JSON / sai cấu trúc -> CorruptDataError."""
         path = self.data_file
         if not os.path.exists(path):
             return {"users": []}
@@ -230,8 +229,7 @@ class SessionManager:
                 yield user
 
     def _next_session_id(self):
-        """Sinh mã dạng SE0001, SE0002... không trùng với bất kỳ session nào (của mọi user) trong file.
-        Mã cũ (kể cả định dạng cũ như SES023) cũng được tính để không bao giờ cấp lại số đã dùng."""
+        """Sinh mã dạng SE0001, SE0002... không trùng với bất kỳ session nào (của mọi user) trong file."""
         ids = [session.session_id for session in self.sessions]
         for user in self._users(self._read_file()):
             raw_sessions = user.get("sessions", [])

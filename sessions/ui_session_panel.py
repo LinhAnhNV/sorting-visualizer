@@ -1,4 +1,4 @@
-"""Panel quản lý lịch sử session.
+"""Panel quản lý lịch sử session (chỉ dùng widget tkinter thuần, không dùng ttk).
 
 Cách phần code sắp xếp (của người khác) đưa dữ liệu vào panel:
     panel = SessionPanel(root, manager, result_provider=ham_lay_ket_qua)
@@ -20,7 +20,8 @@ import random
 import sys
 import tkinter as tk
 from collections.abc import Mapping
-from tkinter import ttk, messagebox
+from datetime import datetime
+from tkinter import filedialog, messagebox
 
 import session_manager
 import stats
@@ -29,9 +30,22 @@ import ui_compare_canvas
 ALGORITHMS = ["Bubble Sort", "Selection Sort", "Insertion Sort"]
 ALL = "Tất cả"  # lựa chọn "không lọc"
 
-
 # Các khóa bắt buộc trong kết quả sắp xếp mà phần code sắp xếp phải cung cấp
 RESULT_KEYS = ("values", "sorted_values", "swaps", "comparisons")
+
+# Các cột của bảng: (khóa, tiêu đề, độ rộng tính theo ký tự, căn lề "<" trái / ">" phải)
+COLUMNS = (
+    ("id", "ID", 8, "<"),
+    ("user", "User", 10, "<"),
+    ("algorithm", "Thuật toán", 15, "<"),
+    ("size", "Số phần tử", 10, ">"),
+    ("swaps", "Swaps", 7, ">"),
+    ("comparisons", "So sánh", 8, ">"),
+    ("time", "Thời gian", 19, "<"),
+    ("note", "Ghi chú", 24, "<"),
+)
+TABLE_FONT = "TkFixedFont"  # font cách đều để các cột thẳng hàng
+GRAY = "gray"
 
 
 def demo_result_provider():
@@ -60,6 +74,17 @@ def show_warnings(manager):
     messagebox.showwarning("Cảnh báo dữ liệu", text)
 
 
+def format_row(values):
+    """Ghép một dòng của bảng từ dict {khóa cột: giá trị}; ô quá dài được cắt bớt và thêm dấu …"""
+    cells = []
+    for key, _title, width, align in COLUMNS:
+        text = str(values[key])
+        if len(text) > width:
+            text = text[:width - 1] + "…"
+        cells.append(f"{text:{align}{width}}")
+    return "  ".join(cells)
+
+
 class AddSessionDialog(tk.Toplevel):
     """Hộp thoại thêm session: người dùng chỉ chọn thuật toán và nhập ghi chú.
     Dãy số, dãy sau sắp xếp, swaps, comparisons lấy từ `result` (do phần code sắp xếp cung cấp)."""
@@ -75,25 +100,27 @@ class AddSessionDialog(tk.Toplevel):
         self.algorithm = tk.StringVar(value=ALGORITHMS[0])
         self.note = tk.StringVar()
 
-        form = ttk.Frame(self, padding=12)
+        form = tk.Frame(self, padx=12, pady=12)
         form.pack()
 
         # Tóm tắt dữ liệu sắp được lưu (chỉ đọc) để người dùng biết mình đang lưu kết quả nào
         summary = (f"Kết quả sắp xếp sẽ được lưu: {len(result['values'])} phần tử, "
                    f"{result['swaps']} swaps, {result['comparisons']} so sánh")
-        ttk.Label(form, text=summary, foreground="gray").grid(
+        tk.Label(form, text=summary, fg=GRAY).grid(
             row=0, column=0, columnspan=2, sticky="w", pady=(0, 8))
 
-        ttk.Label(form, text="Thuật toán").grid(row=1, column=0, sticky="w", pady=4, padx=(0, 8))
-        ttk.Combobox(form, textvariable=self.algorithm, values=ALGORITHMS,
-                     state="readonly", width=34).grid(row=1, column=1, pady=4)
-        ttk.Label(form, text="Ghi chú").grid(row=2, column=0, sticky="w", pady=4, padx=(0, 8))
-        ttk.Entry(form, textvariable=self.note, width=36).grid(row=2, column=1, pady=4)
+        tk.Label(form, text="Thuật toán").grid(row=1, column=0, sticky="w", pady=4, padx=(0, 8))
+        algorithm_menu = tk.OptionMenu(form, self.algorithm, *ALGORITHMS)
+        algorithm_menu.config(width=30, anchor="w")
+        algorithm_menu.grid(row=1, column=1, sticky="w", pady=4)
 
-        buttons = ttk.Frame(form)
+        tk.Label(form, text="Ghi chú").grid(row=2, column=0, sticky="w", pady=4, padx=(0, 8))
+        tk.Entry(form, textvariable=self.note, width=36).grid(row=2, column=1, sticky="w", pady=4)
+
+        buttons = tk.Frame(form)
         buttons.grid(row=3, column=0, columnspan=2, sticky="e", pady=(10, 0))
-        ttk.Button(buttons, text="Lưu", command=self.submit).pack(side="left", padx=4)
-        ttk.Button(buttons, text="Hủy", command=self.destroy).pack(side="left", padx=4)
+        tk.Button(buttons, text="Lưu", width=8, command=self.submit).pack(side="left", padx=4)
+        tk.Button(buttons, text="Hủy", width=8, command=self.destroy).pack(side="left", padx=4)
 
         self.transient(master)
         self.grab_set()
@@ -116,90 +143,80 @@ class AddSessionDialog(tk.Toplevel):
         self.destroy()
 
 
-class SessionPanel(ttk.Frame):
-    COLUMNS = (
-        ("id", "ID", 80),
-        ("user", "User", 90),
-        ("algorithm", "Thuật toán", 130),
-        ("size", "Số phần tử", 90),
-        ("swaps", "Swaps", 70),
-        ("comparisons", "So sánh", 80),
-        ("time", "Thời gian", 150),
-        ("note", "Ghi chú", 200),
-    )
-
+class SessionPanel(tk.Frame):
     def __init__(self, master, manager, result_provider=None):
-        super().__init__(master, padding=8)
+        super().__init__(master, padx=8, pady=8)
         self.manager = manager
         self.result_provider = result_provider  # hàm lấy kết quả sắp xếp từ code của người khác
-        self._row_sessions = {}   # iid của dòng trong bảng -> Session
+        self._shown = []          # các Session đang hiển thị, đúng thứ tự từng dòng của bảng
         self._compare_window = None
         self._build()
         self.refresh()
 
     def _build(self):
         # Thanh chọn user: người khác nhập tên của mình rồi bấm "Đổi user"
-        user_bar = ttk.Frame(self)
+        user_bar = tk.Frame(self)
         user_bar.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 6))
-        ttk.Label(user_bar, text="User:").pack(side="left")
+        tk.Label(user_bar, text="User:").pack(side="left")
         self.user_var = tk.StringVar(value=self.manager.username)
-        user_entry = ttk.Entry(user_bar, textvariable=self.user_var, width=20)
+        user_entry = tk.Entry(user_bar, textvariable=self.user_var, width=20)
         user_entry.pack(side="left", padx=6)
         user_entry.bind("<Return>", lambda _e: self.switch_user())
-        ttk.Button(user_bar, text="Đổi user", command=self.switch_user).pack(side="left")
-        self.role_label = ttk.Label(user_bar, foreground="gray")
+        tk.Button(user_bar, text="Đổi user", command=self.switch_user).pack(side="left")
+        self.role_label = tk.Label(user_bar, fg=GRAY)
         self.role_label.pack(side="left", padx=12)
 
         # Thanh lọc / phạm vi xem
-        tools_bar = ttk.Frame(self)
+        tools_bar = tk.Frame(self)
         tools_bar.grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 8))
-        ttk.Label(tools_bar, text="Lọc thuật toán:").pack(side="left")
+        tk.Label(tools_bar, text="Lọc thuật toán:").pack(side="left")
         self.filter_var = tk.StringVar(value=ALL)
-        self.filter_box = ttk.Combobox(tools_bar, textvariable=self.filter_var,
-                                       values=[ALL] + ALGORITHMS, state="readonly", width=16)
+        self.filter_box = tk.OptionMenu(tools_bar, self.filter_var, ALL)
+        self.filter_box.config(width=14, anchor="w")
         self.filter_box.pack(side="left", padx=6)
-        self.filter_box.bind("<<ComboboxSelected>>", lambda _e: self.refresh())
+        self._set_filter_options([ALL] + ALGORITHMS)
 
         # Chỉ admin mới bật được ô này
         self.view_all = tk.BooleanVar(value=False)
-        self.view_all_check = ttk.Checkbutton(tools_bar, text="Xem tất cả user (admin)",
-                                              variable=self.view_all, command=self.refresh)
+        self.view_all_check = tk.Checkbutton(tools_bar, text="Xem tất cả user (admin)",
+                                             variable=self.view_all, command=self.refresh)
         self.view_all_check.pack(side="left", padx=(20, 0))
 
-        # Bảng danh sách session
-        self.tree = ttk.Treeview(self, columns=[c[0] for c in self.COLUMNS],
-                                 show="headings", selectmode="browse", height=10)
-        for key, title, width in self.COLUMNS:
-            self.tree.heading(key, text=title)
-            self.tree.column(key, width=width, anchor="w")
-        scroll = ttk.Scrollbar(self, orient="vertical", command=self.tree.yview)
-        self.tree.configure(yscrollcommand=scroll.set)
-        self.tree.grid(row=2, column=0, sticky="nsew")
-        scroll.grid(row=2, column=1, sticky="ns")
-        self.tree.bind("<<TreeviewSelect>>", self._on_select)
+        # Bảng danh sách session: dòng tiêu đề + Listbox, cùng font cách đều để cột thẳng hàng
+        tk.Label(self, text=format_row({key: title for key, title, _w, _a in COLUMNS}),
+                 font=TABLE_FONT, anchor="w", justify="left").grid(row=2, column=0, sticky="ew")
+        total_width = sum(w for _k, _t, w, _a in COLUMNS) + 2 * (len(COLUMNS) - 1)
+        self.listbox = tk.Listbox(self, font=TABLE_FONT, width=total_width, height=10,
+                                  selectmode="browse", exportselection=False, activestyle="none")
+        scroll = tk.Scrollbar(self, orient="vertical", command=self.listbox.yview)
+        self.listbox.config(yscrollcommand=scroll.set)
+        self.listbox.grid(row=3, column=0, sticky="nsew")
+        scroll.grid(row=3, column=1, sticky="ns")
+        self.listbox.bind("<<ListboxSelect>>", self._on_select)
 
         # Chi tiết session đang chọn
         self.detail = tk.Text(self, height=4, state="disabled", wrap="word")
-        self.detail.grid(row=3, column=0, columnspan=2, sticky="ew", pady=(8, 0))
+        self.detail.grid(row=4, column=0, columnspan=2, sticky="ew", pady=(8, 0))
 
         # Nút chức năng
-        buttons = ttk.Frame(self)
-        buttons.grid(row=4, column=0, columnspan=2, sticky="e", pady=8)
-        ttk.Button(buttons, text="So sánh thuật toán", command=self.open_compare).pack(side="left", padx=4)
-        ttk.Button(buttons, text="Thêm session", command=self.add_session).pack(side="left", padx=4)
-        ttk.Button(buttons, text="Làm mới", command=self.reload).pack(side="left", padx=4)
-        ttk.Button(buttons, text="Xóa session", command=self.delete_selected).pack(side="left", padx=4)
+        buttons = tk.Frame(self)
+        buttons.grid(row=5, column=0, columnspan=2, sticky="e", pady=8)
+        tk.Button(buttons, text="So sánh thuật toán", command=self.open_compare).pack(side="left", padx=4)
+        tk.Button(buttons, text="Xuất thống kê", command=self.export_stats).pack(side="left", padx=4)
+        tk.Button(buttons, text="Thêm session", command=self.add_session).pack(side="left", padx=4)
+        tk.Button(buttons, text="Làm mới", command=self.reload).pack(side="left", padx=4)
+        tk.Button(buttons, text="Xóa session", command=self.delete_selected).pack(side="left", padx=4)
 
         # Thống kê
-        self.stats_label = ttk.Label(self, justify="left")
-        self.stats_label.grid(row=5, column=0, columnspan=2, sticky="w")
+        self.stats_label = tk.Label(self, justify="left", anchor="w")
+        self.stats_label.grid(row=6, column=0, columnspan=2, sticky="w")
 
         # Cho biết đang đọc file nào, có bao nhiêu session
-        self.status_label = ttk.Label(self, foreground="gray")
-        self.status_label.grid(row=6, column=0, columnspan=2, sticky="w", pady=(6, 0))
+        self.status_label = tk.Label(self, fg=GRAY, justify="left", anchor="w")
+        self.status_label.grid(row=7, column=0, columnspan=2, sticky="w", pady=(6, 0))
 
         self.columnconfigure(0, weight=1)
-        self.rowconfigure(2, weight=1)
+        self.rowconfigure(3, weight=1)
 
     # ---------- dữ liệu đang hiển thị ----------
     def _viewing_all(self):
@@ -219,11 +236,22 @@ class SessionPanel(ttk.Frame):
     def _scope_text(self):
         return "tất cả người dùng" if self._viewing_all() else f"user {self.manager.username}"
 
+    def _set_filter_options(self, options):
+        """Dựng lại menu lọc (OptionMenu không tự cập nhật khi danh sách lựa chọn thay đổi)."""
+        menu = self.filter_box["menu"]
+        menu.delete(0, "end")
+        for option in options:
+            menu.add_command(label=option, command=lambda value=option: self._choose_filter(value))
+
+    def _choose_filter(self, value):
+        self.filter_var.set(value)
+        self.refresh()
+
     def _update_filter_options(self, base):
         """Danh sách lọc = các thuật toán có sẵn + thuật toán lạ xuất hiện trong dữ liệu."""
         extra = sorted({s.algorithm for s in base} - set(ALGORITHMS))
         options = [ALL] + ALGORITHMS + extra
-        self.filter_box.config(values=options)
+        self._set_filter_options(options)
         if self.filter_var.get() not in options:
             self.filter_var.set(ALL)
 
@@ -241,14 +269,14 @@ class SessionPanel(ttk.Frame):
         shown = self.manager.filter_by_algorithm(
             None if selected_algorithm == ALL else selected_algorithm, sessions=base)
 
-        self.tree.delete(*self.tree.get_children())
-        self._row_sessions = {}
-        for s in shown:
-            iid = self.tree.insert("", "end", values=(
-                s.session_id, s.username, s.algorithm, len(s.values), s.swaps,
-                s.comparisons, s.create_at.replace("T", " "), s.note,
-            ))
-            self._row_sessions[iid] = s
+        self.listbox.delete(0, "end")
+        self._shown = list(shown)
+        for s in self._shown:
+            self.listbox.insert("end", format_row({
+                "id": s.session_id, "user": s.username, "algorithm": s.algorithm,
+                "size": len(s.values), "swaps": s.swaps, "comparisons": s.comparisons,
+                "time": s.create_at.replace("T", " "), "note": s.note,
+            }))
         self._set_detail("")
         self.stats_label.config(text=stats.format_report(shown))
 
@@ -351,13 +379,46 @@ class SessionPanel(ttk.Frame):
         self._compare_window = ui_compare_canvas.CompareWindow(
             self, lambda: (self._base_sessions(), self._scope_text()))
 
-    def delete_selected(self):
-        selected = self.tree.selection()
-        if not selected:
-            messagebox.showinfo("Thông báo", "Hãy chọn một session để xóa.")
+    def export_stats(self):
+        """Xuất thống kê của các session đang hiển thị (theo phạm vi xem và bộ lọc) ra file JSON."""
+        if not self._shown:
+            messagebox.showinfo("Thông báo", "Không có session nào để thống kê.")
             return
-        session = self._row_sessions.get(selected[0])
+
+        default_name = f"thong_ke_{self.manager.username}_{datetime.now():%Y%m%d_%H%M%S}.json"
+        path = filedialog.asksaveasfilename(
+            title="Xuất thống kê ra file JSON", defaultextension=".json", initialfile=default_name,
+            filetypes=[("File JSON", "*.json"), ("Tất cả các file", "*.*")])
+        if not path:  # người dùng bấm Hủy
+            return
+
+        # Không cho ghi đè lên chính file dữ liệu session
+        if os.path.normcase(os.path.abspath(path)) == os.path.normcase(os.path.abspath(self.manager.data_file)):
+            messagebox.showerror("Không xuất được",
+                                 "Không thể ghi đè file dữ liệu session. Hãy chọn tên file khác.")
+            return
+
+        selected = self.filter_var.get()
+        try:
+            stats.export_json(self._shown, path, username=self.manager.username,
+                              scope=self._scope_text(),
+                              algorithm_filter=None if selected == ALL else selected)
+        except OSError as e:
+            messagebox.showerror("Không xuất được", f"Không ghi được file:\n{path}\n\n{e.strerror or e}")
+            return
+        messagebox.showinfo("Đã xuất", f"Đã xuất thống kê của {len(self._shown)} session ra:\n{path}")
+
+    def _selected_session(self):
+        """Session của dòng đang chọn trong bảng, hoặc None nếu chưa chọn dòng nào."""
+        selection = self.listbox.curselection()
+        if not selection or selection[0] >= len(self._shown):
+            return None
+        return self._shown[selection[0]]
+
+    def delete_selected(self):
+        session = self._selected_session()
         if session is None:
+            messagebox.showinfo("Thông báo", "Hãy chọn một session để xóa.")
             return
         # Admin xem được session của người khác nhưng chỉ xóa được session của chính mình
         if session.username != self.manager.username:
@@ -376,12 +437,10 @@ class SessionPanel(ttk.Frame):
 
     # ---------- nội bộ ----------
     def _on_select(self, _event):
-        selected = self.tree.selection()
-        if not selected:
-            return
-        s = self._row_sessions.get(selected[0])
+        s = self._selected_session()
         if s:
             self._set_detail(f"Người dùng: {s.username}\n"
+                             f"Ghi chú: {s.note}\n"
                              f"Dữ liệu gốc: {s.values}\nSau khi sắp xếp: {s.sorted_values}")
 
     def _set_detail(self, text):

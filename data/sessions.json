@@ -78,7 +78,7 @@
                 {
                     "session_id": "SE0004",
                     "username": "khoa",
-                    "algorithm": "Quick Sort",
+                    "algorithm": "Insertion Sort",
                     "values": [
                         12,
                         5,
@@ -91,7 +91,7 @@
                     "swaps": 5,
                     "comparisons": 14,
                     "create_at": "2026-10-17T16:45:00",
-                    "note": "Thu nghiem Quick Sort",
+                    "note": "Thu nghiem Insertion Sort",
                     "sorted_values": [
                         1,
                         3,
@@ -215,7 +215,7 @@
                 {
                     "session_id": "SE0009",
                     "username": "an",
-                    "algorithm": "Quick Sort",
+                    "algorithm": "Insertion Sort",
                     "values": [
                         6,
                         2,
@@ -227,7 +227,7 @@
                     "swaps": 4,
                     "comparisons": 11,
                     "create_at": "2026-10-14T15:10:00",
-                    "note": "Kiem tra Quick Sort",
+                    "note": "Kiem tra Insertion Sort",
                     "sorted_values": [
                         1,
                         2,
@@ -341,7 +341,7 @@
                 {
                     "session_id": "SE0015",
                     "username": "linh",
-                    "algorithm": "Quick Sort",
+                    "algorithm": "Insertion Sort",
                     "values": [
                         5,
                         5,
@@ -441,7 +441,7 @@
                 {
                     "session_id": "SE0019",
                     "username": "nam",
-                    "algorithm": "Quick Sort",
+                    "algorithm": "Insertion Sort",
                     "values": [
                         11,
                         4,
@@ -541,7 +541,7 @@
                         112,
                         555
                     ],
-                    "swaps": 10,
+                    "swaps": 11,
                     "comparisons": 11,
                     "create_at": "2026-10-19T21:16:13",
                     "note": "This is not a test session.",
