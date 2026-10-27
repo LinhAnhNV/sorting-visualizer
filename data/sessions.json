@@ -1,0 +1,562 @@
+{
+    "users": [
+        {
+            "username": "khoa",
+            "role": "user",
+            "sessions": [
+                {
+                    "session_id": "SE0001",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        5,
+                        2,
+                        8,
+                        1,
+                        9
+                    ],
+                    "swaps": 6,
+                    "comparisons": 10,
+                    "create_at": "2026-10-15T08:30:00",
+                    "note": "Lan chay thu Bubble Sort",
+                    "sorted_values": [
+                        1,
+                        2,
+                        5,
+                        8,
+                        9
+                    ],
+                    "username": "khoa"
+                },
+                {
+                    "session_id": "SE0002",
+                    "username": "khoa",
+                    "algorithm": "Selection Sort",
+                    "values": [
+                        10,
+                        3,
+                        7,
+                        4,
+                        1,
+                        8
+                    ],
+                    "swaps": 4,
+                    "comparisons": 15,
+                    "create_at": "2026-10-15T09:15:00",
+                    "note": "So sanh voi Bubble Sort",
+                    "sorted_values": [
+                        1,
+                        3,
+                        4,
+                        7,
+                        8,
+                        10
+                    ]
+                },
+                {
+                    "session_id": "SE0003",
+                    "username": "khoa",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        4,
+                        2,
+                        6,
+                        1,
+                        3
+                    ],
+                    "swaps": 5,
+                    "comparisons": 9,
+                    "create_at": "2026-10-16T14:20:00",
+                    "note": "Thu voi mang nho",
+                    "sorted_values": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        6
+                    ]
+                },
+                {
+                    "session_id": "SE0004",
+                    "username": "khoa",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        12,
+                        5,
+                        3,
+                        9,
+                        1,
+                        7,
+                        4
+                    ],
+                    "swaps": 5,
+                    "comparisons": 14,
+                    "create_at": "2026-10-17T16:45:00",
+                    "note": "Thu nghiem Insertion Sort",
+                    "sorted_values": [
+                        1,
+                        3,
+                        4,
+                        5,
+                        7,
+                        9,
+                        12
+                    ]
+                }
+            ]
+        },
+        {
+            "username": "minh",
+            "role": "user",
+            "sessions": [
+                {
+                    "session_id": "SE0005",
+                    "username": "minh",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        9,
+                        8,
+                        7,
+                        6,
+                        5
+                    ],
+                    "swaps": 10,
+                    "comparisons": 10,
+                    "create_at": "2026-10-14T10:00:00",
+                    "note": "Mang sap xep giam dan",
+                    "sorted_values": [
+                        5,
+                        6,
+                        7,
+                        8,
+                        9
+                    ]
+                },
+                {
+                    "session_id": "SE0006",
+                    "username": "minh",
+                    "algorithm": "Merge Sort",
+                    "values": [
+                        15,
+                        3,
+                        11,
+                        2,
+                        8,
+                        6,
+                        1,
+                        9
+                    ],
+                    "swaps": 0,
+                    "comparisons": 17,
+                    "create_at": "2026-10-15T11:30:00",
+                    "note": "Kiem tra Merge Sort",
+                    "sorted_values": [
+                        1,
+                        2,
+                        3,
+                        6,
+                        8,
+                        9,
+                        11,
+                        15
+                    ]
+                },
+                {
+                    "session_id": "SE0007",
+                    "username": "minh",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        1,
+                        3,
+                        5,
+                        7,
+                        9
+                    ],
+                    "swaps": 0,
+                    "comparisons": 4,
+                    "create_at": "2026-10-16T13:00:00",
+                    "note": "Mang da tang dan",
+                    "sorted_values": [
+                        1,
+                        3,
+                        5,
+                        7,
+                        9
+                    ]
+                }
+            ]
+        },
+        {
+            "username": "an",
+            "role": "user",
+            "sessions": [
+                {
+                    "session_id": "SE0008",
+                    "username": "an",
+                    "algorithm": "Selection Sort",
+                    "values": [
+                        20,
+                        10,
+                        30,
+                        5,
+                        15
+                    ],
+                    "swaps": 3,
+                    "comparisons": 10,
+                    "create_at": "2026-10-13T08:00:00",
+                    "note": "Thu du lieu ngau nhien",
+                    "sorted_values": [
+                        5,
+                        10,
+                        15,
+                        20,
+                        30
+                    ]
+                },
+                {
+                    "session_id": "SE0009",
+                    "username": "an",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        6,
+                        2,
+                        9,
+                        1,
+                        8,
+                        3
+                    ],
+                    "swaps": 4,
+                    "comparisons": 11,
+                    "create_at": "2026-10-14T15:10:00",
+                    "note": "Kiem tra Insertion Sort",
+                    "sorted_values": [
+                        1,
+                        2,
+                        3,
+                        6,
+                        8,
+                        9
+                    ]
+                },
+                {
+                    "session_id": "SE0010",
+                    "username": "an",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        4,
+                        4,
+                        2,
+                        2,
+                        1
+                    ],
+                    "swaps": 7,
+                    "comparisons": 10,
+                    "create_at": "2026-10-17T09:25:00",
+                    "note": "Mang co phan tu trung lap",
+                    "sorted_values": [
+                        1,
+                        2,
+                        2,
+                        4,
+                        4
+                    ]
+                },
+                {
+                    "session_id": "SE0011",
+                    "username": "an",
+                    "algorithm": "Merge Sort",
+                    "values": [
+                        100,
+                        45,
+                        23,
+                        89,
+                        12,
+                        67,
+                        34
+                    ],
+                    "swaps": 0,
+                    "comparisons": 13,
+                    "create_at": "2026-10-18T20:00:00",
+                    "note": "Thu voi gia tri lon",
+                    "sorted_values": [
+                        12,
+                        23,
+                        34,
+                        45,
+                        67,
+                        89,
+                        100
+                    ]
+                },
+                {
+                    "session_id": "SE0012",
+                    "username": "an",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        3,
+                        1,
+                        2
+                    ],
+                    "swaps": 2,
+                    "comparisons": 3,
+                    "create_at": "2026-10-19T08:45:00",
+                    "note": "Mang rat nho",
+                    "sorted_values": [
+                        1,
+                        2,
+                        3
+                    ]
+                }
+            ]
+        },
+        {
+            "username": "linh",
+            "role": "user",
+            "sessions": [
+                {
+                    "session_id": "SE0013",
+                    "username": "linh",
+                    "algorithm": "Bubble Sort",
+                    "values": [],
+                    "swaps": 0,
+                    "comparisons": 0,
+                    "create_at": "2026-10-15T12:00:00",
+                    "note": "Mang rong",
+                    "sorted_values": []
+                },
+                {
+                    "session_id": "SE0014",
+                    "username": "linh",
+                    "algorithm": "Selection Sort",
+                    "values": [
+                        42
+                    ],
+                    "swaps": 0,
+                    "comparisons": 0,
+                    "create_at": "2026-10-16T12:30:00",
+                    "note": "Mang chi co mot phan tu",
+                    "sorted_values": [
+                        42
+                    ]
+                },
+                {
+                    "session_id": "SE0015",
+                    "username": "linh",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        5,
+                        5,
+                        5,
+                        5,
+                        5
+                    ],
+                    "swaps": 0,
+                    "comparisons": 10,
+                    "create_at": "2026-10-17T18:15:00",
+                    "note": "Tat ca phan tu bang nhau",
+                    "sorted_values": [
+                        5,
+                        5,
+                        5,
+                        5,
+                        5
+                    ]
+                }
+            ]
+        },
+        {
+            "username": "nam",
+            "role": "user",
+            "sessions": [
+                {
+                    "session_id": "SE0016",
+                    "username": "nam",
+                    "algorithm": "Merge Sort",
+                    "values": [
+                        50,
+                        20,
+                        40,
+                        10,
+                        30
+                    ],
+                    "swaps": 0,
+                    "comparisons": 8,
+                    "create_at": "2026-10-16T09:00:00",
+                    "note": "Kiem tra Merge Sort",
+                    "sorted_values": [
+                        10,
+                        20,
+                        30,
+                        40,
+                        50
+                    ]
+                },
+                {
+                    "session_id": "SE0017",
+                    "username": "nam",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        3,
+                        7,
+                        2,
+                        9,
+                        1,
+                        6
+                    ],
+                    "swaps": 8,
+                    "comparisons": 15,
+                    "create_at": "2026-10-17T10:20:00",
+                    "note": "Mang hon hop",
+                    "sorted_values": [
+                        1,
+                        2,
+                        3,
+                        6,
+                        7,
+                        9
+                    ]
+                },
+                {
+                    "session_id": "SE0018",
+                    "username": "nam",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        8,
+                        6,
+                        4,
+                        2,
+                        0
+                    ],
+                    "swaps": 10,
+                    "comparisons": 10,
+                    "create_at": "2026-10-18T14:40:00",
+                    "note": "Mang giam dan",
+                    "sorted_values": [
+                        0,
+                        2,
+                        4,
+                        6,
+                        8
+                    ]
+                },
+                {
+                    "session_id": "SE0019",
+                    "username": "nam",
+                    "algorithm": "Insertion Sort",
+                    "values": [
+                        11,
+                        4,
+                        15,
+                        2,
+                        7,
+                        13,
+                        1,
+                        9
+                    ],
+                    "swaps": 6,
+                    "comparisons": 16,
+                    "create_at": "2026-10-19T09:30:00",
+                    "note": "Thu nghiem voi 8 phan tu",
+                    "sorted_values": [
+                        1,
+                        2,
+                        4,
+                        7,
+                        9,
+                        11,
+                        13,
+                        15
+                    ]
+                }
+            ]
+        },
+        {
+            "username": "Nhu",
+            "role": "admin",
+            "sessions": [
+                {
+                    "session_id": "SE0020",
+                    "username": "Nhu",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        5,
+                        2,
+                        9,
+                        1,
+                        5,
+                        7
+                    ],
+                    "swaps": 10,
+                    "comparisons": 11,
+                    "create_at": "2026-10-19T21:16:13",
+                    "note": "This is not a test session.",
+                    "sorted_values": [
+                        1,
+                        2,
+                        5,
+                        5,
+                        7,
+                        9
+                    ]
+                },
+                {
+                    "session_id": "SE0021",
+                    "username": "Nhu",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        5,
+                        2,
+                        9,
+                        1,
+                        5,
+                        874,
+                        112,
+                        555
+                    ],
+                    "swaps": 10,
+                    "comparisons": 11,
+                    "create_at": "2026-10-19T21:16:13",
+                    "note": "This is not a test session.",
+                    "sorted_values": [
+                        1,
+                        2,
+                        5,
+                        5,
+                        9,
+                        112,
+                        555,
+                        874
+                    ]
+                },
+                {
+                    "session_id": "SE0022",
+                    "username": "Nhu",
+                    "algorithm": "Bubble Sort",
+                    "values": [
+                        5,
+                        2,
+                        9,
+                        1,
+                        5,
+                        874,
+                        112,
+                        555
+                    ],
+                    "swaps": 11,
+                    "comparisons": 11,
+                    "create_at": "2026-10-19T21:16:13",
+                    "note": "This is not a test session.",
+                    "sorted_values": [
+                        1,
+                        2,
+                        5,
+                        5,
+                        9,
+                        112,
+                        555,
+                        874
+                    ]
+                }
+            ]
+        }
+    ]
+}
