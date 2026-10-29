@@ -156,7 +156,7 @@ class SessionManager:
         self.data_file = data_file
         self.role = ROLE_USER  # được cập nhật từ file trong load()
         self.sessions = []
-        self.warnings = []     # cảnh báo của lần load() gần nhất (bản ghi lỗi bị bỏ qua...)
+        self.warnings = []     # cảnh báo của lần load() gần nhất
         self._skipped_raw = [] # bản ghi lỗi của user này: không hiển thị nhưng vẫn giữ nguyên trong file
 
     @property
@@ -279,7 +279,7 @@ class SessionManager:
     def load(self):
         """Đọc dữ liệu của user này. Nếu lỗi thì trạng thái cũ được giữ nguyên."""
         file_exists = os.path.exists(self.data_file)
-        data = self._read_file()  # có thể raise SessionDataError / CorruptDataError
+        data = self._read_file()
 
         warnings = []
         if not file_exists:
@@ -368,7 +368,7 @@ class SessionManager:
         - algorithm, note: người dùng nhập.
         - values (dãy đầu vào), sorted_values (dãy sau sắp xếp), swaps, comparisons: do phần code
           sắp xếp cung cấp.
-        - session_id: hệ thống tự sinh (SE0001, SE0002...), không nhận từ bên ngoài.
+        - session_id: hệ thống tự sinh.
         Dữ liệu sai thì raise ValueError."""
         _validate(algorithm, values, sorted_values, swaps, comparisons)
         note = "" if note is None else str(note).strip()

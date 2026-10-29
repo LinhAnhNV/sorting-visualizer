@@ -4,7 +4,7 @@ Phần code khác truyền các dữ kiện cần thiết vào như sau:
     panel = SessionPanel(root, result_provider=ham_lay_ket_qua)   # tạo panel, lúc này chưa có user
     panel.pack(fill="both", expand=True)
     ...
-    panel.set_user("Nhu")     # đăng nhập xong thì gọi (đổi user cũng gọi lại hàm này)
+    panel.set_user("username")     # đăng nhập xong thì gọi (đổi user cũng gọi lại hàm này)
     panel.clear_user()        # đăng xuất thì gọi
    set_user trả về True nếu đọc dữ liệu thành công, False nếu lỗi file (đã báo bằng hộp thoại,
    panel giữ nguyên user cũ). Username rỗng / không phải chuỗi -> ValueError.
