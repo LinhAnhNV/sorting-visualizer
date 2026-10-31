@@ -1,20 +1,3 @@
-"""Panel quản lý lịch sử session (chỉ dùng widget tkinter thuần, không dùng ttk).
-
-Cách phần code sắp xếp (của người khác) đưa dữ liệu vào panel:
-    panel = SessionPanel(root, manager, result_provider=ham_lay_ket_qua)
-    # hoặc gắn sau: panel.set_result_provider(ham_lay_ket_qua)
-
-`ham_lay_ket_qua()` không nhận tham số và trả về kết quả của lần sắp xếp gần nhất:
-    {"values": [5, 2, 9],          # dãy đầu vào
-     "sorted_values": [2, 5, 9],   # dãy sau khi sắp xếp
-     "swaps": 2,                   # số lần hoán đổi
-     "comparisons": 3}             # số lần so sánh
-hoặc trả về None nếu chưa có kết quả nào. Khi bấm "Thêm session", người dùng chỉ chọn
-thuật toán và nhập ghi chú; mã session (SE0001, SE0002...) do hệ thống tự sinh.
-
-Không dùng giao diện thì gọi thẳng:
-    manager.add_and_save(algorithm, values, sorted_values, swaps, comparisons, note)
-"""
 import os
 import random
 import sys
@@ -49,8 +32,7 @@ GRAY = "gray"
 
 
 def demo_result_provider():
-    """CHỈ ĐỂ CHẠY THỬ giao diện (python ui_session_panel.py Nhu --demo): sinh một dãy ngẫu nhiên,
-    sắp xếp nổi bọt và đếm swap/so sánh. Trong ứng dụng thật, dữ liệu này do phần code sắp xếp cung cấp."""
+    """CHỈ ĐỂ CHẠY THỬ giao diện (python ui_session_panel.py Nhu --demo)"""
     values = [random.randint(1, 99) for _ in range(random.randint(5, 10))]
     data = list(values)
     swaps = comparisons = 0
@@ -87,7 +69,7 @@ def format_row(values):
 
 class AddSessionDialog(tk.Toplevel):
     """Hộp thoại thêm session: người dùng chỉ chọn thuật toán và nhập ghi chú.
-    Dãy số, dãy sau sắp xếp, swaps, comparisons lấy từ `result` (do phần code sắp xếp cung cấp)."""
+    Dãy số, dãy sau sắp xếp, swaps, comparisons lấy từ `result`."""
 
     def __init__(self, master, manager, result, on_added):
         super().__init__(master)
@@ -144,9 +126,10 @@ class AddSessionDialog(tk.Toplevel):
 
 
 class SessionPanel(tk.Frame):
-    def __init__(self, master, manager, result_provider=None):
+    def __init__(self, master, manager=None, result_provider=None, data_file=None):
         super().__init__(master, padx=8, pady=8)
-        self.manager = manager
+        self.manager = manager    # None = chưa đăng nhập, chờ phần đăng nhập gọi set_user()
+        self.data_file = data_file or (manager.data_file if manager else session_manager.DATA_FILE)
         self.result_provider = result_provider  # hàm lấy kết quả sắp xếp từ code của người khác
         self._shown = []          # các Session đang hiển thị, đúng thứ tự từng dòng của bảng
         self._compare_window = None
@@ -154,17 +137,9 @@ class SessionPanel(tk.Frame):
         self.refresh()
 
     def _build(self):
-        # Thanh chọn user: người khác nhập tên của mình rồi bấm "Đổi user"
-        user_bar = tk.Frame(self)
-        user_bar.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 6))
-        tk.Label(user_bar, text="User:").pack(side="left")
-        self.user_var = tk.StringVar(value=self.manager.username)
-        user_entry = tk.Entry(user_bar, textvariable=self.user_var, width=20)
-        user_entry.pack(side="left", padx=6)
-        user_entry.bind("<Return>", lambda _e: self.switch_user())
-        tk.Button(user_bar, text="Đổi user", command=self.switch_user).pack(side="left")
-        self.role_label = tk.Label(user_bar, fg=GRAY)
-        self.role_label.pack(side="left", padx=12)
+        # Chỉ hiển thị user đang đăng nhập (do phần đăng nhập truyền vào qua set_user), không cho nhập tay
+        self.role_label = tk.Label(self, fg=GRAY, anchor="w")
+        self.role_label.grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 6))
 
         # Thanh lọc / phạm vi xem
         tools_bar = tk.Frame(self)
@@ -220,7 +195,7 @@ class SessionPanel(tk.Frame):
 
     # ---------- dữ liệu đang hiển thị ----------
     def _viewing_all(self):
-        return self.manager.is_admin and self.view_all.get()
+        return self.manager is not None and self.manager.is_admin and self.view_all.get()
 
     def _base_sessions(self):
         """Session trước khi lọc thuật toán: của mình, hoặc của tất cả nếu là admin đang bật xem tất cả."""
@@ -231,9 +206,11 @@ class SessionPanel(tk.Frame):
                 self.view_all.set(False)  # quay về chỉ xem session của mình
                 messagebox.showerror("Lỗi file dữ liệu",
                                      f"Không đọc được session của các user khác:\n{e}")
-        return self.manager.sessions
+        return self.manager.sessions if self.manager is not None else []
 
     def _scope_text(self):
+        if self.manager is None:
+            return "chưa đăng nhập"
         return "tất cả người dùng" if self._viewing_all() else f"user {self.manager.username}"
 
     def _set_filter_options(self, options):
@@ -258,16 +235,20 @@ class SessionPanel(tk.Frame):
     def refresh(self):
         """Vẽ lại bảng và thống kê theo vai trò, phạm vi xem và bộ lọc hiện tại."""
         # Không phải admin thì không được bật chế độ xem tất cả
-        if not self.manager.is_admin:
+        is_admin = self.manager is not None and self.manager.is_admin
+        if not is_admin:
             self.view_all.set(False)
-        self.view_all_check.config(state="normal" if self.manager.is_admin else "disabled")
-        self.role_label.config(text=f"Vai trò: {self.manager.role}")
+        self.view_all_check.config(state="normal" if is_admin else "disabled")
+        if self.manager is None:
+            self.role_label.config(text="Chưa đăng nhập")
+        else:
+            self.role_label.config(text=f"User: {self.manager.username} | Vai trò: {self.manager.role}")
 
         base = self._base_sessions()
         self._update_filter_options(base)
         selected_algorithm = self.filter_var.get()
-        shown = self.manager.filter_by_algorithm(
-            None if selected_algorithm == ALL else selected_algorithm, sessions=base)
+        algorithm = None if selected_algorithm == ALL else selected_algorithm
+        shown = [] if self.manager is None else self.manager.filter_by_algorithm(algorithm, sessions=base)
 
         self.listbox.delete(0, "end")
         self._shown = list(shown)
@@ -280,8 +261,10 @@ class SessionPanel(tk.Frame):
         self._set_detail("")
         self.stats_label.config(text=stats.format_report(shown))
 
-        path = self.manager.data_file
-        if os.path.exists(path):
+        path = self.data_file
+        if self.manager is None:
+            self.status_label.config(text="Chưa đăng nhập: chờ phần đăng nhập gọi set_user(username).")
+        elif os.path.exists(path):
             warn = f" | Cảnh báo: {len(self.manager.warnings)}" if self.manager.warnings else ""
             self.status_label.config(
                 text=f"User '{self.manager.username}' ({self.manager.role}) | Phạm vi: {self._scope_text()}"
@@ -289,7 +272,8 @@ class SessionPanel(tk.Frame):
         else:
             self.status_label.config(text=f"Không tìm thấy file dữ liệu: {path} (sẽ được tạo khi lưu)")
 
-        self.winfo_toplevel().title(f"Lịch sử session - {self.manager.username}")
+        title = "Lịch sử session" if self.manager is None else f"Lịch sử session - {self.manager.username}"
+        self.winfo_toplevel().title(title)
 
     # ---------- đọc dữ liệu, xử lý lỗi file ----------
     def _try_load(self, manager):
@@ -320,24 +304,38 @@ class SessionPanel(tk.Frame):
 
     def reload(self):
         """Đọc lại dữ liệu từ file rồi vẽ lại."""
+        if self.manager is None:
+            return
         if self._try_load(self.manager):
             self.refresh()
 
-    def switch_user(self):
-        name = self.user_var.get().strip()
-        if not name:
-            messagebox.showinfo("Thông báo", "Hãy nhập tên user.")
-            return
-        new_manager = session_manager.SessionManager(name, data_file=self.manager.data_file)
+    def set_user(self, username):
+        """Phần đăng nhập gọi hàm này sau khi đăng nhập thành công để báo user hiện tại cho panel.
+        Đọc dữ liệu của user đó từ file rồi vẽ lại (đổi user cũng gọi lại hàm này).
+        Trả về True nếu thành công; False nếu không đọc được file (đã báo lỗi bằng hộp thoại,
+        panel giữ nguyên user cũ). username rỗng / không phải chuỗi -> ValueError."""
+        new_manager = session_manager.SessionManager(username, data_file=self.data_file)
         if not self._try_load(new_manager):
-            self.user_var.set(self.manager.username)  # giữ nguyên user hiện tại
-            return
+            return False
         self.manager = new_manager
-        self.view_all.set(False)  # đổi user thì quay về xem session của riêng mình
+        self._reset_view()
+        return True
+
+    def clear_user(self):
+        """Phần đăng nhập gọi khi đăng xuất: xóa dữ liệu đang hiển thị, về trạng thái chưa đăng nhập."""
+        self.manager = None
+        self._reset_view()
+
+    def _reset_view(self):
+        """Đổi user thì quay về xem session của riêng mình, bỏ bộ lọc cũ, vẽ lại cả cửa sổ so sánh."""
+        self.view_all.set(False)
+        self.filter_var.set(ALL)
         self.refresh()
+        if self._compare_window is not None and self._compare_window.winfo_exists():
+            self._compare_window.redraw()
 
     def set_result_provider(self, provider):
-        """Gắn (hoặc đổi) hàm cung cấp kết quả sắp xếp, xem mô tả ở đầu file."""
+        """Gắn (hoặc đổi) hàm cung cấp kết quả sắp xếp."""
         self.result_provider = provider
 
     def _fetch_result(self):
@@ -365,6 +363,9 @@ class SessionPanel(tk.Frame):
         return result
 
     def add_session(self):
+        if self.manager is None:
+            messagebox.showinfo("Thông báo", "Chưa đăng nhập nên chưa thể thêm session.")
+            return
         result = self._fetch_result()
         if result is None:
             return
@@ -453,12 +454,12 @@ class SessionPanel(tk.Frame):
 if __name__ == "__main__":
     args = [a for a in sys.argv[1:] if a != "--demo"]
     username = args[0] if args else "Nhu"
-    manager = session_manager.SessionManager(username)
 
     root = tk.Tk()
-    # --demo: dùng dữ liệu sắp xếp giả để thử nút "Thêm session" khi chưa ghép với code sắp xếp thật
+    # --demo: dùng dữ liệu sắp xếp giả để thử nút "Thêm session".
     provider = demo_result_provider if "--demo" in sys.argv else None
-    panel = SessionPanel(root, manager, result_provider=provider)
+    panel = SessionPanel(root, result_provider=provider)
     panel.pack(fill="both", expand=True)
-    panel.reload()  # load dữ liệu; lỗi file được báo bằng hộp thoại thay vì làm chương trình sập
+    # Giả lập phần đăng nhập
+    root.after(0, lambda: panel.set_user(username))
     root.mainloop()
