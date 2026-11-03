@@ -1,175 +1,70 @@
+"""Điểm vào của chương trình.
+
+    python main.py                 # mở giao diện Tkinter
+    python main.py --benchmark     # chạy benchmark bằng dòng lệnh, lưu kết quả JSON/CSV
 """
-DEMO: Minh hoa y tuong SortingAlgorithm + Canvas + Control panel
-Chi lam Bubble Sort de de theo doi. Day la ban demo don gian,
-chua theo dung cau truc thu muc (algorithms/, sessions/...) da thiet ke.
-"""
+from __future__ import annotations
 
-import tkinter as tk
-from abc import ABC, abstractmethod
-import random
+import argparse
+import os
+import sys
 
-# ============================================================
-# PHAN 1: Lop truu tuong (kien thuc Chuong 2 - OOP)
-# Neu chua hoc toi day, cu doc nhu 1 "khuon mau" chung cho moi thuat toan
-# ============================================================
-class SortingAlgorithm(ABC):
-    def __init__(self, values):
-        self.values = values.copy()
-        self.so_sanh = 0
-        self.so_hoan_doi = 0
-        self.ten = "Chua dat ten"
+ROOT = os.path.dirname(os.path.abspath(__file__))
+if ROOT not in sys.path:
+    sys.path.insert(0, ROOT)
 
-    @abstractmethod
-    def step(self):
-        """Thuc hien 1 buoc nho nhat. Tra ve (idx1, idx2) dang duoc so sanh
-        de Canvas biet highlight cot nao, hoac None neu da xong."""
-        pass
-
-    def get_state(self):
-        return self.values
-
-    def is_done(self):
-        return self.so_sanh > 0 and getattr(self, "_done", False)
-
-    def get_counts(self):
-        return self.so_sanh, self.so_hoan_doi
-
-    def get_ten(self):
-        return self.ten
+from algorithms import algorithm_names, get_class          # noqa: E402
+from core.benchmark import BenchmarkConfig, format_table, run_benchmark  # noqa: E402
+from core.data_manager import (SCENARIOS, default_results_path, parse_sizes,  # noqa: E402
+                               save_results)
 
 
-# ============================================================
-# PHAN 2: Lop con - Bubble Sort
-# ============================================================
-class BubbleSort(SortingAlgorithm):
-    def __init__(self, values):
-        super().__init__(values)
-        self.ten = "Bubble Sort"
-        self.i = 0
-        self.j = 0
-        self._done = False
-
-    def step(self):
-        n = len(self.values)
-        if self.i >= n - 1:
-            self._done = True
-            return None
-
-        # 1 buoc = 1 lan so sanh (+ hoan doi neu can)
-        self.so_sanh += 1
-        idx1, idx2 = self.j, self.j + 1
-
-        if self.values[self.j] > self.values[self.j + 1]:
-            self.values[self.j], self.values[self.j + 1] = (
-                self.values[self.j + 1],
-                self.values[self.j],
-            )
-            self.so_hoan_doi += 1
-
-        self.j += 1
-        if self.j >= n - 1 - self.i:
-            self.j = 0
-            self.i += 1
-
-        return (idx1, idx2)
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="Hệ thống trực quan hóa thuật toán sắp xếp")
+    p.add_argument("--benchmark", action="store_true",
+                   help="chạy benchmark không giao diện rồi thoát")
+    p.add_argument("--sizes", default="50,100,200,500,1000", help="các kích thước dãy, vd 100,500,1000")
+    p.add_argument("--scenario", default="all", choices=["all", *SCENARIOS],
+                   help="kịch bản dữ liệu (mặc định: all)")
+    p.add_argument("--algorithms", default="all",
+                   help="danh sách khoá thuật toán: bubble,selection,insertion,merge,quick")
+    p.add_argument("--repeats", type=int, default=3, help="số lần lặp mỗi phép đo")
+    p.add_argument("--out", help="file kết quả (.json hoặc .csv); mặc định data/results/benchmark_*.json")
+    return p
 
 
-# ============================================================
-# PHAN 3: Giao dien Tkinter (kien thuc Chuong 4)
-# ============================================================
-class App:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Demo - Bubble Sort Visualizer")
+def run_cli_benchmark(args) -> int:
+    try:
+        sizes = parse_sizes(args.sizes)
+        names = (algorithm_names() if args.algorithms == "all"
+                 else [get_class(t).name for t in args.algorithms.split(",") if t.strip()])
+        scenarios = list(SCENARIOS) if args.scenario == "all" else [args.scenario]
+        config = BenchmarkConfig(algorithms=names, sizes=sizes, scenarios=scenarios,
+                                 repeats=args.repeats)
+        rows = run_benchmark(config, progress=lambda d, t, m: print(f"[{d}/{t}] {m}", file=sys.stderr))
+    except (ValueError, KeyError) as e:
+        print(f"Lỗi: {e}", file=sys.stderr)
+        return 2
+    print(format_table(rows))
+    out = args.out or default_results_path(os.path.join(ROOT, "data", "results"))
+    save_results(out, rows)
+    print(f"\nĐã lưu kết quả: {out}")
+    return 0
 
-        self.values = [random.randint(10, 100) for _ in range(9)]
-        self.algo = BubbleSort(self.values)
-        self.running = False
-        self.highlight = None
 
-        # --- Canvas ve cot ---
-        self.canvas = tk.Canvas(root, width=400, height=200, bg="white")
-        self.canvas.pack(pady=10)
-
-        # --- Control panel ---
-        frame = tk.Frame(root)
-        frame.pack(pady=5)
-
-        tk.Button(frame, text="Random", command=self.lam_moi).grid(row=0, column=0, padx=3)
-        tk.Button(frame, text="Start", command=self.start).grid(row=0, column=1, padx=3)
-        tk.Button(frame, text="Pause", command=self.pause).grid(row=0, column=2, padx=3)
-        tk.Button(frame, text="Step", command=self.step_once).grid(row=0, column=3, padx=3)
-        tk.Button(frame, text="Reset", command=self.reset).grid(row=0, column=4, padx=3)
-
-        # --- Slider toc do ---
-        self.toc_do = tk.Scale(root, from_=1, to=10, orient="horizontal", label="Toc do")
-        self.toc_do.set(5)
-        self.toc_do.pack(pady=5)
-
-        # --- Label dem so sanh/hoan doi ---
-        self.label_dem = tk.Label(root, text="So sanh: 0 | Hoan doi: 0")
-        self.label_dem.pack(pady=5)
-
-        self.ve_canvas()
-
-    def ve_canvas(self):
-        self.canvas.delete("all")
-        n = len(self.algo.values)
-        w = 400 // n
-        for idx, val in enumerate(self.algo.values):
-            x0 = idx * w
-            y0 = 200 - val
-            x1 = x0 + w - 4
-            y1 = 200
-            # cot dang duoc so sanh thi to mau cam, con lai mau xam
-            mau = "orange" if self.highlight and idx in self.highlight else "gray"
-            self.canvas.create_rectangle(x0, y0, x1, y1, fill=mau)
-
-        so_sanh, so_hoan_doi = self.algo.get_counts()
-        self.label_dem.config(text=f"So sanh: {so_sanh} | Hoan doi: {so_hoan_doi}")
-
-    def step_once(self):
-        if self.algo.is_done():
-            self.running = False
-            return
-        self.highlight = self.algo.step()
-        self.ve_canvas()
-
-    def vong_lap_tu_dong(self):
-        if not self.running:
-            return
-        if self.algo.is_done():
-            self.running = False
-            return
-        self.step_once()
-        # .after(ms, ham) = goi lai ham nay sau vai mili-giay
-        # toc do cao -> cho it thoi gian hon
-        delay = 600 - self.toc_do.get() * 50
-        self.root.after(delay, self.vong_lap_tu_dong)
-
-    def start(self):
-        if not self.running:
-            self.running = True
-            self.vong_lap_tu_dong()
-
-    def pause(self):
-        self.running = False
-
-    def reset(self):
-        self.running = False
-        self.algo = BubbleSort(self.values)
-        self.highlight = None
-        self.ve_canvas()
-
-    def lam_moi(self):
-        self.running = False
-        self.values = [random.randint(10, 100) for _ in range(9)]
-        self.algo = BubbleSort(self.values)
-        self.highlight = None
-        self.ve_canvas()
+def main(argv=None) -> int:
+    args = build_parser().parse_args(argv)
+    if args.benchmark:
+        return run_cli_benchmark(args)
+    try:
+        from ui.app import run
+    except ImportError as e:
+        print("Không khởi động được giao diện: thiếu tkinter "
+              f"({e}).\nTrên Ubuntu/Debian: sudo apt install python3-tk", file=sys.stderr)
+        return 1
+    run()
+    return 0
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = App(root)
-    root.mainloop()
+    sys.exit(main())

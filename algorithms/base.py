@@ -1,54 +1,134 @@
-# Lớp cơ sở cho các thuật toán sắp xếp chạy từng bước
+"""Lớp trừu tượng SortingAlgorithm và các kiểu dữ liệu mô tả một "bước" sắp xếp.
+
+Ý tưởng cốt lõi
+---------------
+Mỗi thuật toán được viết dưới dạng *generator* (``_steps``). Mỗi lần ``yield``
+là một bước nhỏ (so sánh / hoán đổi / ghi đè ...). Giao diện chỉ việc gọi
+``step()`` mỗi lần cần tiến thêm một bước, còn benchmark gọi ``run_all()``.
+Lớp này hoàn toàn không biết Tkinter tồn tại nên có thể kiểm thử độc lập.
+"""
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from enum import Enum
+from typing import Dict, Iterator, List, NamedTuple, Optional, Sequence, Tuple
+
+
+class StepType(Enum):
+    """Loại thao tác của một bước."""
+
+    COMPARE = "compare"      # so sánh hai phần tử
+    SWAP = "swap"            # hoán đổi hai phần tử
+    OVERWRITE = "overwrite"  # ghi đè một vị trí (merge sort)
+    PIVOT = "pivot"          # đánh dấu phần tử chốt (quick sort)
+    DONE = "done"            # thuật toán kết thúc
+
+
+class Step(NamedTuple):
+    """Một bước thực thi: loại thao tác và các chỉ số cột liên quan."""
+
+    type: StepType
+    indices: Tuple[int, ...]
+
 
 class SortingAlgorithm(ABC):
-    """Khuôn chung cho mọi thuật toán sắp xếp."""
-    def __init__(self, values):
-        self._original = list(values)  # bản gốc, để reset() quay về
-        self.values = list(values)     # bản đang được sắp xếp dần
-        self.so_sanh = 0               # số lần so sánh
-        self.so_hoan_doi = 0           # số lần hoán đổi
-        self.name = "Chua dat ten"      # lớp con gán lại tên thật
+    """Lớp cha của mọi thuật toán sắp xếp.
+
+    Lớp con chỉ cần:
+      * khai báo các thuộc tính mô tả (``name``, ``key``, độ phức tạp ...),
+      * cài đặt generator ``_steps()``; dùng ``_cmp``, ``_swap``, ``_write``,
+        ``_pivot`` để vừa thực hiện thao tác, vừa cập nhật bộ đếm, vừa tạo Step.
+    """
+
+    # ---- Thông tin mô tả (lớp con ghi đè) -------------------------------
+    key: str = "base"
+    name: str = "Base"
+    description: str = ""
+    time_best: str = ""
+    time_average: str = ""
+    time_worst: str = ""
+    space: str = ""
+    stable: bool = False
+
+    def __init__(self, data: Sequence[int]):
+        self.original: List[int] = list(data)
+        self.reset()
+
+    # ---- Vòng đời --------------------------------------------------------
+    def reset(self) -> None:
+        """Đưa thuật toán về trạng thái ban đầu với dãy dữ liệu gốc."""
+        self.data: List[int] = list(self.original)
+        self.comparisons = 0
+        self.swaps = 0
+        self.overwrites = 0
+        self.steps_count = 0
+        self.finished = False
+        self._gen: Iterator[Step] = self._steps()
 
     @abstractmethod
-    def step(self):
-        """Làm đúng một thao tác nhỏ (một lần so sánh hoặc hoán đổi).
-        Trả về (idx1, idx2): hai vị trí vừa xử lý, để Canvas tô màu.
-        Trả về None nếu thuật toán đã xong."""
+    def _steps(self) -> Iterator[Step]:
+        """Generator mô tả thuật toán. Mỗi ``yield`` là một bước."""
 
-    @abstractmethod
-    def is_done(self):
-        """True nếu đã sắp xếp xong.
-        Phải đúng cả với dãy rỗng và dãy 1 phần tử, nếu không run_all()
-        sẽ chạy mãi không dừng."""
+    # ---- Giao diện sử dụng -----------------------------------------------
+    def step(self) -> Optional[Step]:
+        """Chạy một bước.
 
-    def get_state(self):
-        """Trả về bản sao dãy hiện tại để Canvas vẽ."""
-        return self.values
+        Trả về ``Step`` kế tiếp. Khi thuật toán vừa xong sẽ trả về một Step
+        loại ``DONE`` đúng một lần; các lần gọi sau trả về ``None``.
+        """
+        if self.finished:
+            return None
+        try:
+            s = next(self._gen)
+        except StopIteration:
+            self.finished = True
+            return Step(StepType.DONE, ())
+        self.steps_count += 1
+        return s
 
-    def get_counts(self):
-        """Trả về (số lần so sánh, số lần hoán đổi)."""
-        return self.so_sanh, self.so_hoan_doi
+    def run_all(self) -> None:
+        """Chạy một mạch đến hết (dùng cho benchmark / kiểm thử, không cần UI)."""
+        while self.step() is not None:
+            pass
 
-    def get_name(self):
-        """Trả về tên thuật toán để hiển thị."""
-        return self.name
+    def is_sorted(self) -> bool:
+        a = self.data
+        return all(a[i] <= a[i + 1] for i in range(len(a) - 1))
 
-    def reset(self):
-        """Đưa dãy về ban đầu và xóa bộ đếm.
-        Lớp con có biến nhớ vị trí riêng (VD i, j) thì ghi đè hàm này,
-        gọi super().reset() rồi tự đặt lại các biến đó."""
-        self.values = list(self._original)
-        self.so_sanh = 0
-        self.so_hoan_doi = 0
+    def info(self) -> Dict[str, object]:
+        return {
+            "key": self.key,
+            "name": self.name,
+            "description": self.description,
+            "best": self.time_best,
+            "average": self.time_average,
+            "worst": self.time_worst,
+            "space": self.space,
+            "stable": self.stable,
+        }
 
-    def run_all(self):
-        """Chạy liên tục tới khi xong, trả về (so_sanh, so_hoan_doi)."""
-        while not self.is_done():
-            self.step()
-        return self.get_counts()
+    # ---- Trợ giúp cho lớp con --------------------------------------------
+    def _cmp(self, i: int, j: int) -> Step:
+        """Ghi nhận một lần so sánh giữa chỉ số i và j."""
+        self.comparisons += 1
+        return Step(StepType.COMPARE, (i, j))
 
-    def _swap(self, i, j):
-        """Hoán đổi hai phần tử và tự cộng vào bộ đếm hoán đổi."""
-        self.values[i], self.values[j] = self.values[j], self.values[i]
-        self.so_hoan_doi += 1
+    def _swap(self, i: int, j: int) -> Step:
+        """Hoán đổi a[i] và a[j], ghi nhận một lần hoán đổi."""
+        a = self.data
+        a[i], a[j] = a[j], a[i]
+        self.swaps += 1
+        return Step(StepType.SWAP, (i, j))
+
+    def _write(self, k: int, value: int) -> Step:
+        """Ghi đè a[k] = value, ghi nhận một lần ghi đè."""
+        self.data[k] = value
+        self.overwrites += 1
+        return Step(StepType.OVERWRITE, (k,))
+
+    def _pivot(self, i: int) -> Step:
+        """Đánh dấu phần tử chốt (không tính vào so sánh/hoán đổi)."""
+        return Step(StepType.PIVOT, (i,))
+
+    def __repr__(self) -> str:  # pragma: no cover - chỉ để debug
+        return f"<{self.__class__.__name__} n={len(self.original)}>"

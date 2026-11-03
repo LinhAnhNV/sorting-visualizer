@@ -1,0 +1,3 @@
+# Chương trình chỉ dùng thư viện chuẩn của Python 3.8+ (tkinter đi kèm Python trên Windows/macOS).
+# Trên Ubuntu/Debian cần: sudo apt install python3-tk
+# (tuỳ chọn) pytest nếu muốn chạy test bằng pytest thay cho unittest

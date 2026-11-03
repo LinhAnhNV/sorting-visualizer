@@ -1,61 +1,39 @@
-# Sorting Visualizer
+# Hệ thống trực quan hóa thuật toán sắp xếp (Đề tài 28)
 
-Đồ án học phần **Lập trình Python** — Bộ môn KHDL & TTNT, HUIT.
-Đề tài 28: Hệ thống trực quan hóa thuật toán sắp xếp.
+Ứng dụng **Tkinter** minh họa quá trình chạy của 5 thuật toán sắp xếp trên **Canvas**, có chạy từng bước,
+tạm dừng/tiếp tục, đếm số lần so sánh – hoán đổi, và so sánh hiệu năng trên nhiều kích thước dãy.
+Chỉ dùng thư viện chuẩn của Python.
 
-## Mô tả
-
-Ứng dụng Tkinter minh họa quá trình chạy của các thuật toán sắp xếp (Bubble, Insertion, Quick) theo từng bước trên Canvas, kèm quản lý phiên mô phỏng, thống kê hiệu năng, tài khoản người dùng có phân quyền và tích hợp API lấy dữ liệu ngẫu nhiên.
-
-## Thành viên nhóm
-
-| Tên | Vai trò |
-|---|---|
-| Nguyễn Văn Linh Anh (A) | Core thuật toán + Trực quan hóa (Canvas) |
-| Nguyễn Trần Anh Khoa (B) | Quản lý phiên mô phỏng + Thống kê |
-| Trương Phạm Gia Nghi (C) | Tài khoản + Regex + Crawl/API |
-
-## Cấu trúc thư mục
-
-```
-sorting-visualizer/
-├── main.py # Điểm khởi động, ráp 3 module vào main window
-├── config.py # Hằng số dùng chung (đường dẫn, màu sắc, font)
-├── algorithms/ # Module A — lớp thuật toán sắp xếp + UI Canvas
-├── sessions/ # Module B — CRUD phiên, thống kê hiệu năng
-├── accounts/ # Module C — tài khoản, Regex, API
-├── data/ # File dữ liệu JSON (không commit dữ liệu thật)
-├── utils/ # Tiện ích dùng chung (sys module...)
-└── tests/ # Test case từng module
-```
-
-## Yêu cầu môi trường
-
-- Python 3.11 hoặc 3.14
-- Xem thư viện phụ thuộc trong `requirements.txt`
-
-## Cài đặt
+## Chạy nhanh
 
 ```bash
-git clone https://github.com/LinhAnhNV/sorting-visualizer.git
-cd sorting-visualizer
-pip install -r requirements.txt
+python main.py                # mở giao diện
+python main.py --benchmark    # benchmark dòng lệnh, lưu kết quả vào data/results/
+python -m unittest discover -s tests -t .    # chạy toàn bộ 85 test
 ```
 
-## Chạy ứng dụng
+Yêu cầu: Python 3.8+ (khuyến nghị 3.10+) và `tkinter`
+(Windows/macOS có sẵn; Ubuntu/Debian: `sudo apt install python3-tk`).
 
-```bash
-python main.py
+## Cấu trúc
+
+```
+sorting_visualizer/
+├── main.py                  # điểm vào (GUI hoặc --benchmark)
+├── algorithms/              # lớp trừu tượng SortingAlgorithm + 5 thuật toán
+│   ├── base.py  bubble.py  selection.py  insertion.py  merge.py  quick.py
+├── core/                    # logic không phụ thuộc giao diện
+│   ├── data_manager.py      # sinh số, nhập tay, đọc/ghi JSON/CSV
+│   ├── runner.py            # máy trạng thái IDLE/RUNNING/PAUSED/FINISHED
+│   └── benchmark.py         # đo hiệu năng nhiều kích thước
+├── ui/                      # giao diện Tkinter
+│   ├── app.py  canvas_view.py  control_panel.py  benchmark_window.py
+├── tests/                   # 85 test (unittest)
+├── data/                    # sample.json, sample.csv, results/ (kết quả benchmark)
+└── docs/                    # BaoCao.md, HuongDanSuDung.md
 ```
 
-## Quy tắc làm việc nhóm
+## Tài liệu
 
-- Mỗi thành viên làm việc trên 1 nhánh riêng (`feature/algorithms`, `feature/sessions`, `feature/accounts`), không sửa code trong thư mục module của người khác.
-- Merge vào `main` sau khi đã test riêng phần của mình.
-
-## Tiến độ
-
-- [x] Tuần 4: Khởi tạo cấu trúc thư mục, thiết kế sơ đồ lớp
-- [ ] Tuần 6-9: Code chức năng từng module
-- [ ] Tuần 11-12: Tích hợp UI
-- [ ] Tuần 13-15: Kiểm thử, đóng gói, báo cáo
+* [`docs/BaoCao.md`](docs/BaoCao.md) – báo cáo phân tích, thiết kế lớp, kiểm thử, kết quả đo.
+* [`docs/HuongDanSuDung.md`](docs/HuongDanSuDung.md) – hướng dẫn sử dụng.
